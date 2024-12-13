@@ -19,14 +19,23 @@ import org.springframework.context.annotation.Configuration;
 @EnableMethodSecurity
 public class SecurityConfig {
     @Bean
-    SecurityFilterChain defauSecurityFilterChain(HttpSecurity http) throws Exception{
-        http.authorizeHttpRequests((requests)->requests.anyRequest().authenticated());
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception
+    {
+        http.authorizeHttpRequests((requests)->
+                requests.requestMatchers("/h2-console/**").permitAll()
+                        .anyRequest().authenticated());
         http.sessionManagement(session
-        ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        //http.formLogin(withDefaults());
+                ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.httpBasic(withDefaults());
+        http.headers(headers->
+                headers.frameOptions(frameOptions->frameOptions.sameOrigin()));
+                http.headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions
+                        .sameOrigin()
+                )
+        );
+        http.csrf(csrf->csrf.disable());
         return http.build();
-
     }
     @Bean
     public UserDetailsService userDetailsService()
